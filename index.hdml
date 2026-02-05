@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Valentine's Escape</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%);
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+        }
+        
+        /* Container */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 6px solid #ff4d6d;
+            position: relative;
+            z-index: 10;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Header */
+        h1 {
+            color: #ff4d6d;
+            text-align: center;
+            font-size: clamp(2rem, 5vw, 2.8rem);
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: #d63384;
+            text-align: center;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: #fff0f3;
+            padding: 18px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #ff4d6d;
+        }
+        
+        .instructions p {
+            color: #a4133c;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            line-height: 1.4;
+        }
+        
+        /* Game Area */
+        .game-area {
+            background: #ffccd5;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+            min-height: 220px;
+            border: 3px dashed #ff4d6d;
+        }
+        
+        .button-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+        }
+        
+        /* Buttons */
+        .valentine-button {
+            position: absolute;
+            padding: 18px 30px;
+            font-size: clamp(1.4rem, 4vw, 1.8rem);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            z-index: 100;
+            min-width: 160px;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: none;
+        }
+        
+        #yesButton {
+            background: linear-gradient(to right, #ff4d6d, #ff8fa3);
+            color: white;
+            border: 4px solid #c9184a;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #noButton {
+            background: linear-gradient(to right, #4361ee, #4cc9f0);
+            color: white;
+            border: 4px solid #3a0ca3;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .valentine-button:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-box {
+            background: #ffccd5;
+            padding: 12px 20px;
+            border-radius: 50px;
+            min-width: 140px;
+        }
+        
+        .stat-title {
+            font-size: 1rem;
+            color: #a4133c;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            color: #ff4d6d;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        /* Message */
+        .message-container {
+            background: #fff0f3;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .message-container.show {
+            display: block;
+        }
+        
+        .message-text {
+            color: #ff4d6d;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            text-align: center;
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            color: #a4133c;
+            font-size: 0.9rem;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ff8fa3;
+        }
+        
+        /* Decorative Elements */
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .heart {
+            color: #ff4d6d;
+            font-size: clamp(20px, 4vw, 30px);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .balloon {
+            width: clamp(40px, 8vw, 60px);
+            height: clamp(55px, 11vw, 80px);
+            border-radius: 50%;
+            position: absolute;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .balloon:before {
+            content: '';
+            position: absolute;
+            width: 2px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.7);
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .balloon.red {
+            background: radial-gradient(circle at 30% 30%, #ff4d6d, #c9184a);
+        }
+        
+        .balloon.pink {
+            background: radial-gradient(circle at 30% 30%, #ff8fa3, #ff4d6d);
+        }
+        
+        .balloon.purple {
+            background: radial-gradient(circle at 30% 30%, #b388eb, #7209b7);
+        }
+        
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes celebrate {
+            0% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(-100vh) scale(0); 
+                opacity: 0;
+            }
+        }
+        
+        /* Mobile-specific optimizations */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px 15px;
+                border-width: 4px;
+                max-height: 85vh;
+            }
+            
+            .game-area {
+                padding: 15px;
+                min-height: 200px;
+            }
+            
+            .button-container {
+                height: 180px;
+            }
+            
+            .valentine-button {
+                padding: 15px 25px;
+                min-width: 140px;
+            }
+            
+            .stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .stat-box {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+        
+        /* Prevent text selection on buttons */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Decorations will be added by JavaScript -->
+    <div class="container">
+        <h1><i class="fas fa-heart"></i> Valentine's Escape <i class="fas fa-heart"></i></h1>
+        <div class="subtitle">Catch the "YES" button if you can!</div>
+        
+        <div class="instructions">
+            <p><i class="fas fa-info-circle"></i> Try to tap the "YES" button, but the "NO" button will run away! See how many attempts it takes to catch "YES".</p>
+        </div>
+        
+        <div class="game-area">
+            <div class="button-container" id="buttonContainer">
+                <!-- Buttons will be added by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-title">Attempts</div>
+                <div class="stat-value" id="attemptCount">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-title">Time</div>
+                <div class="stat-value" id="timer">0s</div>
+            </div>
+        </div>
+        
+        <div class="message-container" id="messageContainer">
+            <div class="message-text" id="messageText"></div>
+        </div>
+        
+        <div class="footer">
+            Made with <i class="fas fa-heart" style="color: #ff4d6d;"></i> for Valentine's Day
+            <div style="font-size: 0.8rem; margin-top: 5px;">Tap anywhere to start!</div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile-optimized Valentine's Button Escape Game
+        document.addEventListener('DOMContentLoaded', function() {
+            // Game variables
+            let attempts = 0;
+            let gameActive = true;
+            let gameStarted = false;
+            let startTime = null;
+            let timerInterval = null;
+            let noButtonMoveCount = 0;
+            
+            // DOM elements
+            const buttonContainer = document.getElementById('buttonContainer');
+            const attemptCountElement = document.getElementById('attemptCount');
+            const timerElement = document.getElementById('timer');
+            const messageContainer = document.getElementById('messageContainer');
+            const messageText = document.getElementById('messageText');
+            
+            // Create buttons
+            function createButtons() {
+                // Create YES button
+                const yesButton = document.createElement('button');
+                yesButton.id = 'yesButton';
+                yesButton.className = 'valentine-button no-select';
+                yesButton.innerHTML = '<i class="fas fa-heart"></i> YES <i class="fas fa-heart"></i>';
+                
+                // Create NO button
+                const noButton = document.createElement('button');
+                noButton.id = 'noButton';
+                noButton.className = 'valentine-button no-select';
+                noButton.innerHTML = '<i class="fas fa-running"></i> NO <i class="fas fa-running"></i>';
+                
+                // Position buttons initially
+                positionButtons(yesButton, noButton);
+                
+                // Add buttons to container
+                buttonContainer.appendChild(yesButton);
+                buttonContainer.appendChild(noButton);
+                
+                return { yesButton, noButton };
+            }
+            
+            // Initial button positioning
+            function positionButtons(yesButton, noButton) {
+                const containerWidth = buttonContainer.clientWidth;
+                const containerHeight = buttonContainer.clientHeight;
+                
+                // Position YES button
+                const yesWidth = 160;
+                const yesHeight = 70;
+                const yesLeft = (containerWidth - yesWidth) / 2;
+                const yesTop = (containerHeight - yesHeight) / 2;
+                
+                yesButton.style.left = `${yesLeft}px`;
+                yesButton.style.top = `${yesTop}px`;
+                yesButton.style.width = `${yesWidth}px`;
+                
+                // Position NO button away from YES button
+                const noWidth = 160;
+                const noHeight = 70;
+                let noLeft, noTop;
+                
+                // Position NO button on the opposite side
+                if (yesLeft < containerWidth / 2) {
+                    noLeft = Math.min(containerWidth - noWidth - 10, yesLeft + yesWidth + 30);
+                } else {
+                    noLeft = Math.max(10, yesLeft - noWidth - 30);
+                }
+                
+                if (yesTop < containerHeight / 2) {
+                    noTop = Math.min(containerHeight - noHeight - 10, yesTop + yesHeight + 30);
+                } else {
+                    noTop = Math.max(10, yesTop - noHeight - 30);
+                }
+                
+                noButton.style.left = `${noLeft}px`;
+                noButton.style.top = `${noTop}px`;
+                noButton.style.width = `${noWidth}px`;
+            }
+            
+            // Create background decorations
+            function createDecorations() {
+                const colors = ['red', 'pink', 'purple'];
+                
+                // Create hearts
+                for (let i = 0; i < 15; i++) {
+                    const heart = document.createElement('div');
+                    heart.className = 'decoration heart';
+                    heart.innerHTML = '❤';
+                    
+                    // Random position and animation
+                    heart.style.left = `${Math.random() * 100}%`;
+                    heart.style.top = `${Math.random() * 100}%`;
+                    heart.style.fontSize = `${Math.random() * 20 + 15}px`;
+                    heart.style.animationDelay = `${Math.random() * 5}s`;
+                    heart.style.animationDuration = `${Math.random() * 4 + 4}s`;
+                    heart.style.opacity = `${Math.random() * 0.4 + 0.3}`;
+                    
+                    document.body.appendChild(heart);
+                }
+                
+                // Create balloons
+                for (let i = 0; i < 8; i++) {
+                    const balloon = document.createElement('div');
+                    balloon.className = `decoration balloon ${colors[Math.floor(Math.random() * colors.length)]}`;
+                    
+                    // Random position and animation
+                    balloon.style.left = `${Math.random() * 100}%`;
+                    balloon.style.top = `${Math.random() * 100 + 100}%`;
+                    balloon.style.animationDelay = `${Math.random() * 5}s`;
+                    balloon.style.animationDuration = `${Math.random() * 6 + 6}s`;
+                    
+                    document.body.appendChild(balloon);
+                }
+            }
+            
+            // Move button to a random position
+            function moveButton(button, maxDistance = 150) {
+                if (!gameActive) return;
+                
+                const containerWidth = buttonContainer.clientWidth;
+                const containerHeight = buttonContainer.clientHeight;
+                const buttonWidth = button.clientWidth || 160;
+                const buttonHeight = button.clientHeight || 70;
+                
+                // Get current position
+                const currentLeft = parseInt(button.style.left) || 0;
+                const currentTop = parseInt(button.style.top) || 0;
+                
+                // Calculate new position
+                let newLeft, newTop;
+                let attempts = 0;
+                
+                do {
+                    newLeft = Math.random() * (containerWidth - buttonWidth);
+                    newTop = Math.random() * (containerHeight - buttonHeight);
+                    attempts++;
+                    
+                    // Ensure we don't get stuck in loop on very small screens
+                    if (attempts > 20) break;
+                } while (
+                    Math.abs(newLeft - currentLeft) < maxDistance/2 && 
+                    Math.abs(newTop - currentTop) < maxDistance/2
+                );
+                
+                // Ensure buttons stay within bounds
+                newLeft = Math.max(5, Math.min(newLeft, containerWidth - buttonWidth - 5));
+                newTop = Math.max(5, Math.min(newTop, containerHeight - buttonHeight - 5));
+                
+                // Apply new position with animation
+                button.style.transition = 'left 0.4s ease-out, top 0.4s ease-out';
+                button.style.left = `${newLeft}px`;
+                button.style.top = `${newTop}px`;
+                
+                // Remove transition after animation completes
+                setTimeout(() => {
+                    button.style.transition = '';
+                }, 400);
+            }
+            
+            // Start the game timer
+            function startTimer() {
+                if (startTime) return;
+                
+                startTime = Date.now();
+                timerInterval = setInterval(updateTimer, 100);
+            }
+            
+            // Update the timer display
+            function updateTimer() {
+                if (!startTime) return;
+                
+                const elapsed = Date.now() - startTime;
+                const seconds = Math.floor(elapsed / 1000);
+                timerElement.textContent = `${seconds}s`;
+            }
+            
+            // Stop the timer
+            function stopTimer() {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            // Handle YES button click
+            function handleYesClick() {
+                if (!gameActive || !gameStarted) return;
+                
+                gameActive = false;
+                stopTimer();
+                
+                // Show celebration
+                showMessage(getSuccessMessage());
+                createCelebration();
+                
+                // Make YES button special
+                const yesButton = document.getElementById('yesButton');
+                yesButton.style.transform = 'scale(1.2)';
+                yesButton.style.boxShadow = '0 0 30px #ff4d6d';
+                yesButton.style.transition = 'all 0.5s';
+                
+                // Disable further moves
+                setTimeout(() => {
+                    const noButton = document.getElementById('noButton');
+                    noButton.style.opacity = '0.5';
+                    noButton.style.pointerEvents = 'none';
+                }, 500);
+            }
+            
+            // Handle NO button interaction
+            function handleNoInteraction() {
+                if (!gameActive) return;
+                
+                if (!gameStarted) {
+                    gameStarted = true;
+                    startTimer();
+                }
+                
+                // Move the NO button
+                moveButton(document.getElementById('noButton'), 180);
+                noButtonMoveCount++;
+                
+                // Occasionally move YES button too
+                if (noButtonMoveCount % 3 === 0) {
+                    moveButton(document.getElementById('yesButton'), 100);
+                }
+                
+                // Update attempts
+                attempts++;
+                attemptCountElement.textContent = attempts;
+                
+                // Show hint after several attempts
+                if (attempts === 5) {
+                    showTemporaryMessage("The NO button is shy! Try tapping YES instead!");
+                } else if (attempts === 10) {
+                    showTemporaryMessage("Keep trying! You'll catch it!");
+                }
+            }
+            
+            // Show a message
+            function showMessage(text) {
+                messageText.textContent = text;
+                messageContainer.classList.add('show');
+            }
+            
+            // Show temporary message
+            function showTemporaryMessage(text) {
+                messageText.textContent = text;
+                messageContainer.classList.add('show');
+                
+                setTimeout(() => {
+                    messageContainer.classList.remove('show');
+                }, 2000);
+            }
+            
+            // Create celebration effect
+            function createCelebration() {
+                for (let i = 0; i < 25; i++) {
+                    setTimeout(() => {
+                        const heart = document.createElement('div');
+                        heart.innerHTML = '❤';
+                        heart.style.position = 'fixed';
+                        heart.style.color = ['#ff4d6d', '#ff8fa3', '#c9184a'][Math.floor(Math.random() * 3)];
+                        heart.style.fontSize = `${Math.random() * 30 + 20}px`;
+                        heart.style.left = `${Math.random() * 100}%`;
+                        heart.style.top = '100%';
+                        heart.style.zIndex = '1000';
+                        heart.style.pointerEvents = 'none';
+                        heart.style.animation = `celebrate ${Math.random() * 2 + 2}s forwards`;
+                        
+                        document.body.appendChild(heart);
+                        
+                        // Remove heart after animation
+                        setTimeout(() => {
+                            if (heart.parentNode) {
+                                heart.parentNode.removeChild(heart);
+                            }
+                        }, 3000);
+                    }, i * 100);
+                }
+            }
+            
+            // Get random success message
+            function getSuccessMessage() {
+                const messages = [
+                    "You caught me! Happy Valentine's Day! 💖",
+                    "Yay! You're my Valentine! 💕",
+                    "Success! Will you be mine? 💘",
+                    "You got me! I'm all yours! 💝",
+                    "Perfect! Happy Valentine's Day! 💗"
+                ];
+                return messages[Math.floor(Math.random() * messages.length)];
+            }
+            
+            // Initialize the game
+            function initGame() {
+                // Create decorations
+                createDecorations();
+                
+                // Create buttons
+                const { yesButton, noButton } = createButtons();
+                
+                // Add event listeners for mobile
+                // Touch events for mobile
+                yesButton.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    handleYesClick();
+                });
+                
+                yesButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleYesClick();
+                });
+                
+                noButton.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    handleNoInteraction();
+                });
+                
+                noButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    handleNoInteraction();
+                });
+                
+                // Also move on touch move (for better mobile experience)
+                noButton.addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                    if (e.touches && e.touches[0]) {
+                        const touch = e.touches[0];
+                        const rect = noButton.getBoundingClientRect();
+                        
+                        // If finger is near the button, move it
+                        if (
+                            touch.clientX > rect.left - 50 &&
+                            touch.clientX < rect.right + 50 &&
+                            touch.clientY > rect.top - 50 &&
+                            touch.clientY < rect.bottom + 50
+                        ) {
+                            handleNoInteraction();
+                        }
+                    }
+                });
+                
+                // Handle window resize
+                window.addEventListener('resize', function() {
+                    positionButtons(yesButton, noButton);
+                });
+                
+                // Start game on any tap
+                document.addEventListener('touchstart', function() {
+                    if (!gameStarted) {
+                        gameStarted = true;
+                        startTimer();
+                        showTemporaryMessage("Game started! Catch the YES button!");
+                    }
+                });
+                
+                document.addEventListener('click', function() {
+                    if (!gameStarted) {
+                        gameStarted = true;
+                        startTimer();
+                        showTemporaryMessage("Game started! Catch the YES button!");
+                    }
+                });
+                
+                // Initial message
+                setTimeout(() => {
+                    showTemporaryMessage("Tap the screen to start the game!");
+                }, 1000);
+            }
+            
+            // Start the game
+            initGame();
+        });
+    </script>
+</body>
+</html> 
